@@ -1,8 +1,41 @@
-<h1>JS-Spa</h1>
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Simple Snake</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="icon" href="http://clipart-library.com/images_k/snake-transparent-png/snake-transparent-png-18.png">
+    <script src="index.js" charset="utf-8"></script>
 
-Need user with name and potentially scores? (use find_or_create_by to access returning users)
-User has many Scores. name:string
-Score belongs to User. value:integer
+  </head>
+  <body>
 
-Need High score list. Any way to ignore scores that don't make the list?
-Use a sort method and put the top X amount of scores as high scores.
+    <div class="menu">
+        <ul>
+            <li><button class = "menu-option">Enter name</button></li>
+            <li><button class = "menu-option">Hide Rules</button></li>
+            <li><button class = "menu-option">Hide Scores</button></li>
+        </ul>
+    </div>
+
+    <h1 id="title">JS-Snake</h1>
+
+    <div class="game-container">
+        <button id="start">Start</button>
+    </div>
+
+    <table class="high-scores">
+        <tr><th>High Scores</th></tr>
+        <tr><td>1st</td></tr>
+        <tr><td>2nd</td></tr>
+        <tr><td>3rd</td></tr>
+    </table>
+</body>
+
+
+
+
+<p class="rules">Navigate with WASD or the arrow keys. Try to get the free block without hitting your own tail or the wall! Don't forget to add a name for the high score list!</p>
+
+<p class="rules">Need High score list. Any way to ignore scores that don't make the list?
+Use a sort method and put the top X amount of scores as high scores.</p>

@@ -8,3 +8,5 @@
 
 steeley96 = User.create(name: "steeley96")
 default_score = Score.create(value: 1, user_id: 1)
+Score.create(value: 2, user_id: 1)
+Score.create(value: 3, user_id: 1)
