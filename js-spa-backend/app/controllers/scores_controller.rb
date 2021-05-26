@@ -24,6 +24,7 @@ class ScoresController < ApplicationController
         sorted.reverse!
         top = sorted.slice(0,3)
         render json: ScoreSerializer.new(top)
+
     end
     
     def destroy

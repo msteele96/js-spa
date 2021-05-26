@@ -12,9 +12,9 @@
 
     <div class="menu">
         <ul>
-            <li><button class = "menu-option">Enter name</button></li>
-            <li><button class = "menu-option">Hide Rules</button></li>
-            <li><button class = "menu-option">Hide Scores</button></li>
+            <li><button class = "menu-option" id="name">Enter Name</button></li>
+            <li><button class = "menu-option" id="rules">Hide Rules</button></li>
+            <li><button class = "menu-option" id="scores">Hide Scores</button></li>
         </ul>
     </div>
 
@@ -26,16 +26,11 @@
 
     <table class="high-scores">
         <tr><th>High Scores</th></tr>
-        <tr><td>1st</td></tr>
-        <tr><td>2nd</td></tr>
-        <tr><td>3rd</td></tr>
+        <tr><td id="first">1st</td></tr>
+        <tr><td id="second">2nd</td></tr>
+        <tr><td id="third">3rd</td></tr>
     </table>
+    <p id="rules-text">Navigate with WASD or the arrow keys. Try to get the free block without hitting your own tail or the wall! Don't forget to add a name for the high score list!</p>
 </body>
 
 
-
-
-<p class="rules">Navigate with WASD or the arrow keys. Try to get the free block without hitting your own tail or the wall! Don't forget to add a name for the high score list!</p>
-
-<p class="rules">Need High score list. Any way to ignore scores that don't make the list?
-Use a sort method and put the top X amount of scores as high scores.</p>
