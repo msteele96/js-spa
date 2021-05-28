@@ -4,15 +4,14 @@ class UsersController < ApplicationController
         render json: UserSerializer.new(user)
     end
 
+    def index
+        users = User.all
+        render json: UserSerializer.new(users)
+    end
+
     def create
-        raise params.inspect
-        # user = User.new(name: params[:])
-
+        user = User.find_or_create_by(name: params[:name])
+        render json: UserSerializer.new(user)
     end
 
-    private
-
-    def user_params
-        
-    end
 end

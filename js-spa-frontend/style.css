@@ -52,6 +52,14 @@
     font-weight:900;
 }
 
+.snake {
+    color: red;
+    position: relative;
+    top: 200px;
+    left: 200px;
+    size: 4px;
+}
+
 .high-scores{
     width: 10%;
     border-style: groove;

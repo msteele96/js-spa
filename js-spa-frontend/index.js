@@ -1,5 +1,7 @@
 const BASE_URL = "http://localhost:3000"
 const HIGHSCORES = `${BASE_URL}/highscores`
+let currentUserId
+let direction
 
 document.addEventListener("DOMContentLoaded", () => {
     loadHighScores()
@@ -50,39 +52,67 @@ const displayNameField = () => {
     nameForm.appendChild(input)
     input.insertAdjacentElement('afterend', submit)
 
+    nameForm.addEventListener("submit", setName)
+
     document.querySelector("div.game-container").appendChild(nameForm)
 
-    submit.addEventListener("submit", setName)
+    document.getElementById("name").removeEventListener("click", displayNameField)
 }
 
 const addListeners = () => {
-    const nameBtn = document.getElementById("name")
     const rulesBtn = document.getElementById("rules")
     const scoresBtn = document.getElementById("scores")
     const startBtn = document.getElementById("start")
 
-    nameBtn.addEventListener("click", displayNameField)
     rulesBtn.addEventListener("click", hideRules)
     scoresBtn.addEventListener("click", hideScores)
-    startBtn.addEventListener("click", () => console.log("started"))
+    startBtn.addEventListener("click", startGame)
+    addNameBtnListener()
+}
+
+const addNameBtnListener = () => {
+    const nameBtn = document.getElementById("name")
+
+    nameBtn.addEventListener("click", displayNameField)
 }
 
 
 const setName = (e) => {
     e.preventDefault()
+
     const configObj = {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
             "Accept": "application/json"
         },
-        body: JSON.stringify({user_id: e.target.dataset.userId})
+        body: JSON.stringify({name: e.target.firstChild.value})
     }
     fetch(`${BASE_URL}/users`, configObj)
     .then(res => res.json())
-    .then(json => console.log(json))
+    .then(json => setUser(json))
+
+    document.getElementById("name").addEventListener("click", displayNameField)
 }
 
-const setUser = () => {
+const setUser = (json) => {
+    console.log("setting user")
+    const name = document.createElement("h4")
+    name.setAttribute("style", "text-align: center")
+    document.querySelector("div#title-holder").appendChild(name)
+    name.textContent = json.data.attributes.name
 
+    currentUserId = json.data.id
+
+    document.querySelector("form.name-field").remove()
+}
+
+const startGame = () => {
+    if (currentUserId != undefined) {
+        const snake = document.createElement("div")
+        snake.setAttribute("class", "snake")
+        document.querySelector("div.game-container").appendChild(snake)
+    } else {
+        window.alert("Enter a name to start playing!")
+    }
 }
