@@ -2,6 +2,9 @@ const BASE_URL = "http://localhost:3000"
 const HIGHSCORES = `${BASE_URL}/highscores`
 let currentUserId
 let direction = "right"
+let target
+let score = 0
+let snake
 
 document.addEventListener("DOMContentLoaded", () => {
     loadHighScores()
@@ -108,7 +111,7 @@ const setUser = (json) => {
 
 const startGame = () => {
     if (currentUserId != undefined) {
-        const snake = document.createElement("div")
+        snake = document.createElement("div")
         snake.setAttribute("class", "snake")
         snake.setAttribute("id", "head")
         snake.style.left = "200px"
@@ -116,9 +119,17 @@ const startGame = () => {
         document.querySelector("div.game-container").appendChild(snake)
         document.getElementById("start").remove()
 
+        const currentScore = document.createElement("p")
+        currentScore.id = "current-score"
+        currentScore.textContent = `Score: ${score}`
+        currentScore.style.textAlign = "center"
+        document.getElementById("title-holder").appendChild(currentScore)
+
         setInterval(moveSnake, 100)
 
         document.addEventListener("keydown", changeDirection)
+
+        newBlock()
     } else {
         window.alert("Enter a name to start playing!")
     }
@@ -147,7 +158,6 @@ const moveSnake = () => {
             head.style.top = `${top + 10}px`
             break;
     }
-
 }
 
 const changeDirection = (e) => {
@@ -167,4 +177,24 @@ const changeDirection = (e) => {
         default:
             break;
     }
+}
+
+const newBlock = () => {
+    target = document.createElement("div")
+    target.setAttribute("class", "snake")
+    target.setAttribute("id", "target")
+    document.querySelector("div.game-container").appendChild(target)
+    target.style.left = `${Math.floor(Math.random()*40)*10}px`
+    target.style.top =`${Math.floor(Math.random()*40)*10}px`
+}
+
+const incrementScore = () =>{
+    score = ++score
+    const scoreElement = document.getElementById("current-score")
+    scoreElement.textContent = `Score: ${score}`
+}
+
+if (snake.style.left === target.style.left && snake.style.top === target.style.top ) {
+    newBlock()
+    incrementScore()
 }
