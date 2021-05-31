@@ -1,7 +1,7 @@
 const BASE_URL = "http://localhost:3000"
 const HIGHSCORES = `${BASE_URL}/highscores`
 let currentUserId
-let direction
+let direction = "right"
 
 document.addEventListener("DOMContentLoaded", () => {
     loadHighScores()
@@ -96,7 +96,6 @@ const setName = (e) => {
 }
 
 const setUser = (json) => {
-    console.log("setting user")
     const name = document.createElement("h4")
     name.setAttribute("style", "text-align: center")
     document.querySelector("div#title-holder").appendChild(name)
@@ -111,8 +110,61 @@ const startGame = () => {
     if (currentUserId != undefined) {
         const snake = document.createElement("div")
         snake.setAttribute("class", "snake")
+        snake.setAttribute("id", "head")
+        snake.style.left = "200px"
+        snake.style.top = "200px"
         document.querySelector("div.game-container").appendChild(snake)
+        document.getElementById("start").remove()
+
+        setInterval(moveSnake, 100)
+
+        document.addEventListener("keydown", changeDirection)
     } else {
         window.alert("Enter a name to start playing!")
+    }
+}
+
+const moveSnake = () => {
+    const head = document.getElementById("head")
+
+    let leftNumbers = head.style.left.replace("px", "");
+    let left = parseInt(leftNumbers, 10);
+    
+    let topNumbers = head.style.top.replace("px", "");
+    let top = parseInt(topNumbers, 10);
+
+    switch (direction) {
+        case "right":
+            head.style.left = `${left + 10}px`
+            break;
+        case "left":
+            head.style.left = `${left - 10}px`
+            break;
+        case "up":
+            head.style.top = `${top - 10}px`
+            break;
+        case "down":
+            head.style.top = `${top + 10}px`
+            break;
+    }
+
+}
+
+const changeDirection = (e) => {
+    switch (e.key) {
+        case "ArrowUp" || "w":
+            direction = "up"
+            break;
+        case "ArrowLeft" || "a":
+            direction = "left"
+            break;
+        case "ArrowDown" || "s":
+            direction = "down"
+            break;
+        case "ArrowRight" || "d":
+            direction = "right"
+            break;
+        default:
+            break;
     }
 }
