@@ -125,7 +125,7 @@ const startGame = () => {
         currentScore.style.textAlign = "center"
         document.getElementById("title-holder").appendChild(currentScore)
 
-        setInterval(moveSnake, 100)
+        active = setInterval(moveSnake, 100)
 
         document.addEventListener("keydown", changeDirection)
 
@@ -158,6 +158,9 @@ const moveSnake = () => {
             head.style.top = `${top + 10}px`
             break;
     }
+    eatBlock()
+    hitWall()
+    // hitTail()
 }
 
 const changeDirection = (e) => {
@@ -185,7 +188,7 @@ const newBlock = () => {
     target.setAttribute("id", "target")
     document.querySelector("div.game-container").appendChild(target)
     target.style.left = `${Math.floor(Math.random()*40)*10}px`
-    target.style.top =`${Math.floor(Math.random()*40)*10}px`
+    target.style.top =`${Math.floor(Math.random()*40)*10 - 10}px`
 }
 
 const incrementScore = () =>{
@@ -194,7 +197,32 @@ const incrementScore = () =>{
     scoreElement.textContent = `Score: ${score}`
 }
 
-if (snake.style.left === target.style.left && snake.style.top === target.style.top ) {
-    newBlock()
-    incrementScore()
+const eatBlock = () => {
+    const targetLeft = parseInt(target.style.left.replace("px", ""), 10)
+    const targetTop =  parseInt(target.style.top.replace("px", ""), 10)
+
+    const snakeLeft = parseInt(snake.style.left.replace("px", ""), 10)
+    const snakeTop = parseInt(snake.style.top.replace("px", ""), 10)
+
+    if (snakeLeft === targetLeft && snakeTop === targetTop + 10) {
+        target.remove()
+        incrementScore()
+        addLength()
+        newBlock()
+    }
+}
+
+const hitWall = () => {
+    const snakeLeft = parseInt(snake.style.left.replace("px", ""), 10)
+    const snakeTop = parseInt(snake.style.top.replace("px", ""), 10)
+
+    if (snakeLeft === 400 || snakeLeft === -10 || snakeTop === -10 || snakeTop === 400) {
+        clearInterval(active)
+        // endGame()
+    }
+}
+
+const addLength = () => {
+    const newTail = document.createElement("div")
+    newTail.setAttribute("class", "snake")
 }
