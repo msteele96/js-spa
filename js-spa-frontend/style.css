@@ -29,7 +29,9 @@
 }
 
 .game-container {
-    margin: auto;
+    position: absolute;
+    top: 225px;
+    left: 555px;
     background-color: limegreen;
     border-style: solid;
     border-width: 5px;
@@ -52,17 +54,32 @@
     font-weight:900;
 }
 
-.snake {
+.tail {
+    background-color: red;
+    position: absolute;
+    height: 10px;
+    width: 10px;
+}
+
+.shadow {
     background-color: red;
     position: relative;
     height: 10px;
     width: 10px;
 }
 
+.food {
+    background-color: black;
+    position: absolute;
+    height: 10px;
+    width: 10px;
+}
+
 #head {
-    position: relative;
-    top: 195px;
-    left: 195px;
+    background-color: red;
+    height: 10px;
+    width: 10px;
+    position: absolute;
 }
 
 .high-scores{
@@ -81,6 +98,8 @@
 }
 
 #rules-text {
+    position: absolute;
+    top: 700px;
     margin-left: 20%;
     display: block;
 }

@@ -4,7 +4,7 @@ let currentUserId
 let direction = "right"
 let target
 let score = 0
-let snake
+let snake = {tail:[]}
 
 document.addEventListener("DOMContentLoaded", () => {
     loadHighScores()
@@ -58,6 +58,7 @@ const displayNameField = () => {
     nameForm.addEventListener("submit", setName)
 
     document.querySelector("div.game-container").appendChild(nameForm)
+    input.focus()
 
     document.getElementById("name").removeEventListener("click", displayNameField)
 }
@@ -79,7 +80,6 @@ const addNameBtnListener = () => {
     nameBtn.addEventListener("click", displayNameField)
 }
 
-
 const setName = (e) => {
     e.preventDefault()
 
@@ -99,6 +99,9 @@ const setName = (e) => {
 }
 
 const setUser = (json) => {
+    if (document.querySelector("h4") != null) {
+        document.querySelector("h4").remove()
+    }
     const name = document.createElement("h4")
     name.setAttribute("style", "text-align: center")
     document.querySelector("div#title-holder").appendChild(name)
@@ -111,12 +114,21 @@ const setUser = (json) => {
 
 const startGame = () => {
     if (currentUserId != undefined) {
-        snake = document.createElement("div")
-        snake.setAttribute("class", "snake")
-        snake.setAttribute("id", "head")
-        snake.style.left = "200px"
-        snake.style.top = "200px"
-        document.querySelector("div.game-container").appendChild(snake)
+        const head = document.createElement("div")
+        head.setAttribute("id", "head")
+        head.style.left = "200px"
+        head.style.top = "200px"
+        document.querySelector("div.game-container").appendChild(head)
+        snake.head = head
+
+        // snake.tail[0] = document.createElement("div")
+        // snake.tail[0].setAttribute("class", "tail") // PROBLEM when evaluating whether snake hit its own tail
+        // snake.tail[0].style.left = "180px"
+        // snake.tail[0].style.top = "200px"
+        // snake.tail.unshift(snake.tail[0])
+
+        // document.querySelector("div.game-container").appendChild(snake.tail[0])
+
         document.getElementById("start").remove()
 
         const currentScore = document.createElement("p")
@@ -136,31 +148,30 @@ const startGame = () => {
 }
 
 const moveSnake = () => {
-    const head = document.getElementById("head")
-
-    let leftNumbers = head.style.left.replace("px", "");
+    let leftNumbers = snake.head.style.left.replace("px", "");
     let left = parseInt(leftNumbers, 10);
     
-    let topNumbers = head.style.top.replace("px", "");
+    let topNumbers = snake.head.style.top.replace("px", "");
     let top = parseInt(topNumbers, 10);
 
     switch (direction) {
         case "right":
-            head.style.left = `${left + 10}px`
+            snake.head.style.left = `${left + 10}px`
             break;
         case "left":
-            head.style.left = `${left - 10}px`
+            snake.head.style.left = `${left - 10}px`
             break;
         case "up":
-            head.style.top = `${top - 10}px`
+            snake.head.style.top = `${top - 10}px`
             break;
         case "down":
-            head.style.top = `${top + 10}px`
+            snake.head.style.top = `${top + 10}px`
             break;
     }
+    slither(left, top)
     eatBlock()
     hitWall()
-    // hitTail()
+    hitTail()
 }
 
 const changeDirection = (e) => {
@@ -184,11 +195,11 @@ const changeDirection = (e) => {
 
 const newBlock = () => {
     target = document.createElement("div")
-    target.setAttribute("class", "snake")
+    target.setAttribute("class", "food")
     target.setAttribute("id", "target")
     document.querySelector("div.game-container").appendChild(target)
     target.style.left = `${Math.floor(Math.random()*40)*10}px`
-    target.style.top =`${Math.floor(Math.random()*40)*10 - 10}px`
+    target.style.top =`${Math.floor(Math.random()*40)*10}px`
 }
 
 const incrementScore = () =>{
@@ -201,10 +212,10 @@ const eatBlock = () => {
     const targetLeft = parseInt(target.style.left.replace("px", ""), 10)
     const targetTop =  parseInt(target.style.top.replace("px", ""), 10)
 
-    const snakeLeft = parseInt(snake.style.left.replace("px", ""), 10)
-    const snakeTop = parseInt(snake.style.top.replace("px", ""), 10)
+    const snakeLeft = parseInt(snake.head.style.left.replace("px", ""), 10)
+    const snakeTop = parseInt(snake.head.style.top.replace("px", ""), 10)
 
-    if (snakeLeft === targetLeft && snakeTop === targetTop + 10) {
+    if (snakeLeft === targetLeft && snakeTop === targetTop) {
         target.remove()
         incrementScore()
         addLength()
@@ -213,8 +224,8 @@ const eatBlock = () => {
 }
 
 const hitWall = () => {
-    const snakeLeft = parseInt(snake.style.left.replace("px", ""), 10)
-    const snakeTop = parseInt(snake.style.top.replace("px", ""), 10)
+    const snakeLeft = parseInt(snake.head.style.left.replace("px", ""), 10)
+    const snakeTop = parseInt(snake.head.style.top.replace("px", ""), 10)
 
     if (snakeLeft === 400 || snakeLeft === -10 || snakeTop === -10 || snakeTop === 400) {
         clearInterval(active)
@@ -222,7 +233,34 @@ const hitWall = () => {
     }
 }
 
+const hitTail = ()  => {
+    const headLeft = snake.head.style.left
+    const headTop = snake.head.style.top
+
+    for (const block of snake.tail) {
+        if (block.style.left === headLeft && block.style.top === headTop) {
+            clearInterval(active)
+            // endGame()
+        }
+    }
+}
+
 const addLength = () => {
     const newTail = document.createElement("div")
-    newTail.setAttribute("class", "snake")
+    newTail.setAttribute("class", "tail")
+    snake.tail[`${score}`] = newTail
+    // document.querySelector("div.game-container").appendChild(newTail)
+}
+
+const slither = (left, top) => {
+    if (snake.tail.length > 0) {
+        const firstTail = document.createElement("div")
+        firstTail.setAttribute("class", "tail")
+        document.querySelector("div.game-container").appendChild(firstTail)
+        firstTail.style.left = `${left}px`
+        firstTail.style.top = `${top}px`
+        snake.tail.unshift(firstTail)
+        snake.tail.pop()
+        snake.tail[snake.tail.length -1].remove()    
+    }
 }
