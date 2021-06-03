@@ -1,21 +1,68 @@
 const BASE_URL = "http://localhost:3000"
 const HIGHSCORES = `${BASE_URL}/highscores`
-let currentUserId
+let currentUser
 let direction
 let target
 let score
 let snake
+
+// class Score {
+//     constructor(value, userName) {
+//         this.value = value;
+//         this.userName = userName;
+//     } 
+// }
+
+class User {
+    constructor(id, name) {
+        this.name = name;
+        this.id = id;
+    }
+
+    _setUser() {
+        if (document.querySelector("h4") === null) {
+            const name = document.createElement("h4")
+            name.setAttribute("style", "text-align: center")
+            document.querySelector("div#title-holder").appendChild(name)    
+        }
+        document.querySelector("h4").textContent = this.name
+    }
+}
 
 document.addEventListener("DOMContentLoaded", () => {
     loadHighScores()
     addListeners()
 })
 
+const addListeners = () => {
+    const rulesBtn = document.getElementById("rules")
+    const scoresBtn = document.getElementById("scores")
+    const startBtn = document.getElementById("start")
+
+    rulesBtn.addEventListener("click", hideRules)
+    scoresBtn.addEventListener("click", hideScores)
+    startBtn.addEventListener("click", startGame)
+    addNameBtnListener()
+}
+
+const addNameBtnListener = () => {
+    const nameBtn = document.getElementById("name")
+
+    nameBtn.addEventListener("click", displayNameField)
+}
+
 const loadHighScores = () => {
     fetch(HIGHSCORES)
     .then(resp => resp.json())
     .then(json => fillHighScoreList(json.data))
+    // .then(json => createScoreObjects(json.data))
 }
+
+// const createScoreObjects = (scores) => {
+//     scores.forEach(score => {
+//         a = new Score(score.attributes.value, score.attributes.user.name)
+//     });
+// }
 
 const fillHighScoreList = (scores) => {
     const first = document.getElementById("first")
@@ -63,25 +110,9 @@ const displayNameField = () => {
     document.getElementById("name").removeEventListener("click", displayNameField)
 }
 
-const addListeners = () => {
-    const rulesBtn = document.getElementById("rules")
-    const scoresBtn = document.getElementById("scores")
-    const startBtn = document.getElementById("start")
-
-    rulesBtn.addEventListener("click", hideRules)
-    scoresBtn.addEventListener("click", hideScores)
-    startBtn.addEventListener("click", startGame)
-    addNameBtnListener()
-}
-
-const addNameBtnListener = () => {
-    const nameBtn = document.getElementById("name")
-
-    nameBtn.addEventListener("click", displayNameField)
-}
-
 const setName = (e) => {
     e.preventDefault()
+    document.querySelector("form.name-field").remove()
 
     const configObj = {
         method: "POST",
@@ -93,26 +124,18 @@ const setName = (e) => {
     }
     fetch(`${BASE_URL}/users`, configObj)
     .then(res => res.json())
-    .then(json => setUser(json))
+    .then(json => createUserObject(json))
 
     document.getElementById("name").addEventListener("click", displayNameField)
 }
 
-const setUser = (json) => {
-    if (document.querySelector("h4") === null) {
-        const name = document.createElement("h4")
-        name.setAttribute("style", "text-align: center")
-        document.querySelector("div#title-holder").appendChild(name)    
-    }
-    document.querySelector("h4").textContent = json.data.attributes.name
-
-    currentUserId = json.data.id
-
-    document.querySelector("form.name-field").remove()
+const createUserObject = (json) => {
+    currentUser = new User(json.data.id, json.data.attributes.name)
+    currentUser._setUser()
 }
 
 const startGame = () => {
-    if (currentUserId != undefined) {
+    if (currentUser != undefined) {
         snake = {tail:[]}
         score = 0
         direction = "right"
@@ -276,10 +299,13 @@ const endGame = () => {
             "Content-Type": "application/json",
             "Accept": "application/json"
         },
-        body: JSON.stringify({score: score, user_id: currentUserId})
+        body: JSON.stringify({score: score, user_id: currentUser.id})
     }
     fetch(`${BASE_URL}/scores`, configObj)
-    .then(loadHighScores())
+    // .then(resp => resp.json())
+    // .then(json => console.log(json))
+    // .then(loadHighScores())
+    setTimeout(loadHighScores, 1000)
     // reload high scores^^
 
     const board = document.querySelector("div.game-container")
