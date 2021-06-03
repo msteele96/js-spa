@@ -9,14 +9,12 @@ class ScoresController < ApplicationController
         render json: ScoreSerializer.new(score)
     end
 
-    # def create
-    #     trainer = Trainer.find(params[:trainer_id])
-    #     pokemon = trainer.pokemons.build({
-    #       nickname: Faker::Name.first_name,
-    #       species: Faker::Games::Pokemon.name
-    #     })
-    #     render json: pokemon.save ? pokemon : {message: pokemon.errors.messages[:team_max][0]}
-    # end
+    def create
+        user = User.find(params[:user_id])
+        score = user.scores.build(value: params[:score])
+        score.save
+        render json: ScoreSerializer.new(score)
+    end
 
     def high
         scores = Score.all

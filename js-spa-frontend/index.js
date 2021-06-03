@@ -1,10 +1,10 @@
 const BASE_URL = "http://localhost:3000"
 const HIGHSCORES = `${BASE_URL}/highscores`
 let currentUserId
-let direction = "right"
+let direction
 let target
-let score = 0
-let snake = {tail:[]}
+let score
+let snake
 
 document.addEventListener("DOMContentLoaded", () => {
     loadHighScores()
@@ -99,13 +99,12 @@ const setName = (e) => {
 }
 
 const setUser = (json) => {
-    if (document.querySelector("h4") != null) {
-        document.querySelector("h4").remove()
+    if (document.querySelector("h4") === null) {
+        const name = document.createElement("h4")
+        name.setAttribute("style", "text-align: center")
+        document.querySelector("div#title-holder").appendChild(name)    
     }
-    const name = document.createElement("h4")
-    name.setAttribute("style", "text-align: center")
-    document.querySelector("div#title-holder").appendChild(name)
-    name.textContent = json.data.attributes.name
+    document.querySelector("h4").textContent = json.data.attributes.name
 
     currentUserId = json.data.id
 
@@ -114,6 +113,10 @@ const setUser = (json) => {
 
 const startGame = () => {
     if (currentUserId != undefined) {
+        snake = {tail:[]}
+        score = 0
+        direction = "right"
+
         const head = document.createElement("div")
         head.setAttribute("id", "head")
         head.style.left = "200px"
@@ -131,11 +134,14 @@ const startGame = () => {
 
         document.getElementById("start").remove()
 
-        const currentScore = document.createElement("p")
-        currentScore.id = "current-score"
-        currentScore.textContent = `Score: ${score}`
-        currentScore.style.textAlign = "center"
-        document.getElementById("title-holder").appendChild(currentScore)
+        if (document.getElementById("current-score") === null) {
+            const currentScore = document.createElement("p")
+            currentScore.id = "current-score"
+            currentScore.style.textAlign = "center"
+            document.getElementById("title-holder").appendChild(currentScore)
+        }
+        document.getElementById("current-score").textContent = `Score: ${score}`
+
 
         active = setInterval(moveSnake, 100)
 
@@ -229,7 +235,7 @@ const hitWall = () => {
 
     if (snakeLeft === 400 || snakeLeft === -10 || snakeTop === -10 || snakeTop === 400) {
         clearInterval(active)
-        // endGame()
+        endGame()
     }
 }
 
@@ -240,7 +246,7 @@ const hitTail = ()  => {
     for (const block of snake.tail) {
         if (block.style.left === headLeft && block.style.top === headTop) {
             clearInterval(active)
-            // endGame()
+            endGame()
         }
     }
 }
@@ -261,4 +267,29 @@ const slither = (left, top) => {
     snake.tail.unshift(firstTail)
     snake.tail[snake.tail.length -1].remove()  
     snake.tail.pop()  
+}
+
+const endGame = () => {
+    const configObj = {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+        },
+        body: JSON.stringify({score: score, user_id: currentUserId})
+    }
+    fetch(`${BASE_URL}/scores`, configObj)
+    .then(loadHighScores())
+    // reload high scores^^
+
+    const board = document.querySelector("div.game-container")
+    // clear div.game-container
+    board.innerHTML = ""
+    // add and wire play again button
+    const start = document.createElement("button")
+    start.setAttribute("id", "start")
+    start.textContent = "Play Again"
+    board.appendChild(start)
+    start.addEventListener("click", startGame)
+    // reinitialize values other than user (done in startGame)
 }
