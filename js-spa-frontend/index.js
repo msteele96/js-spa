@@ -121,13 +121,13 @@ const startGame = () => {
         document.querySelector("div.game-container").appendChild(head)
         snake.head = head
 
-        // snake.tail[0] = document.createElement("div")
-        // snake.tail[0].setAttribute("class", "tail") // PROBLEM when evaluating whether snake hit its own tail
-        // snake.tail[0].style.left = "180px"
-        // snake.tail[0].style.top = "200px"
-        // snake.tail.unshift(snake.tail[0])
+        originalTail = document.createElement("div")
+        originalTail.setAttribute("class", "tail")
+        originalTail.style.left = "190px"
+        originalTail.style.top = "200px"
+        snake.tail.unshift(originalTail)
 
-        // document.querySelector("div.game-container").appendChild(snake.tail[0])
+        document.querySelector("div.game-container").appendChild(snake.tail[0])
 
         document.getElementById("start").remove()
 
@@ -249,18 +249,16 @@ const addLength = () => {
     const newTail = document.createElement("div")
     newTail.setAttribute("class", "tail")
     snake.tail[`${score}`] = newTail
-    // document.querySelector("div.game-container").appendChild(newTail)
+    // no need to appendChild here, next slither() will take care of it
 }
 
 const slither = (left, top) => {
-    if (snake.tail.length > 0) {
-        const firstTail = document.createElement("div")
-        firstTail.setAttribute("class", "tail")
-        document.querySelector("div.game-container").appendChild(firstTail)
-        firstTail.style.left = `${left}px`
-        firstTail.style.top = `${top}px`
-        snake.tail.unshift(firstTail)
-        snake.tail.pop()
-        snake.tail[snake.tail.length -1].remove()    
-    }
+    const firstTail = document.createElement("div")
+    firstTail.setAttribute("class", "tail")
+    document.querySelector("div.game-container").appendChild(firstTail)
+    firstTail.style.left = `${left}px`
+    firstTail.style.top = `${top}px`
+    snake.tail.unshift(firstTail)
+    snake.tail[snake.tail.length -1].remove()  
+    snake.tail.pop()  
 }
