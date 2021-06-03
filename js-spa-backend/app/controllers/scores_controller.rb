@@ -24,9 +24,4 @@ class ScoresController < ApplicationController
         render json: ScoreSerializer.new(top)
 
     end
-    
-    def destroy
-        score = Score.find(params[:id])
-        score.destroy
-    end
 end

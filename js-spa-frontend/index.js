@@ -205,16 +205,16 @@ const moveSnake = () => {
 
 const changeDirection = (e) => {
     switch (e.key) {
-        case "ArrowUp" || "w":
+        case "ArrowUp":
             direction = "up"
             break;
-        case "ArrowLeft" || "a":
+        case "ArrowLeft":
             direction = "left"
             break;
-        case "ArrowDown" || "s":
+        case "ArrowDown":
             direction = "down"
             break;
-        case "ArrowRight" || "d":
+        case "ArrowRight":
             direction = "right"
             break;
         default:
