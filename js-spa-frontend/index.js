@@ -3,20 +3,20 @@ const HIGHSCORES = `${BASE_URL}/highscores`
 let currentUser
 let direction
 let target
-let score
 let snake
 
-// class Score {
-//     constructor(value, userName) {
-//         this.value = value;
-//         this.userName = userName;
-//     } 
-// }
+class Score {
+    constructor(value, userName) {
+        this.value = value;
+        this.userName = userName;
+    } 
+}
 
 class User {
     constructor(id, name) {
         this.name = name;
         this.id = id;
+        this.score = 0
     }
 
     _setUser() {
@@ -54,25 +54,48 @@ const addNameBtnListener = () => {
 const loadHighScores = () => {
     fetch(HIGHSCORES)
     .then(resp => resp.json())
-    .then(json => fillHighScoreList(json.data))
-    // .then(json => createScoreObjects(json.data))
+    // .then(json => fillHighScoreList(json.data))
+    .then(json => createHighScoreEntries(json.data))
 }
 
-// const createScoreObjects = (scores) => {
-//     scores.forEach(score => {
-//         a = new Score(score.attributes.value, score.attributes.user.name)
-//     });
+function ordinal_suffix_of(i) {
+    var j = i % 10,
+        k = i % 100;
+    if (j == 1 && k != 11) {
+        return i + "st";
+    }
+    if (j == 2 && k != 12) {
+        return i + "nd";
+    }
+    if (j == 3 && k != 13) {
+        return i + "rd";
+    }
+    return i + "th";
+}
+
+const createHighScoreEntries = (scores) => {
+    for (const score in scores) {
+        if (Object.hasOwnProperty.call(scores, score)) {
+            const highScore = scores[score];
+            const scoreObj = new Score(highScore.attributes.value, highScore.attributes.user.name)
+            let row = document.createElement("tr")
+            let data = document.createElement("td")
+            row.appendChild(data)
+            data.textContent = `${ordinal_suffix_of(parseInt(score, 10) + 1)} ${scoreObj.userName} ${scoreObj.value}`
+            document.querySelector("table.high-scores").appendChild(row)
+        }
+    }
+}
+
+// const fillHighScoreList = (scores) => {
+//     const first = document.getElementById("first")
+//     const second = document.getElementById("second")
+//     const third = document.getElementById("third")
+
+//     first.innerText = `1st ${scores[0].attributes.user.name} ${scores[0].attributes.value}`
+//     second.innerText = `2nd ${scores[1].attributes.user.name} ${scores[1].attributes.value}`
+//     third.innerText = `3rd ${scores[2].attributes.user.name} ${scores[2].attributes.value}`
 // }
-
-const fillHighScoreList = (scores) => {
-    const first = document.getElementById("first")
-    const second = document.getElementById("second")
-    const third = document.getElementById("third")
-
-    first.innerText = `1st ${scores[0].attributes.user.name} ${scores[0].attributes.value}`
-    second.innerText = `2nd ${scores[1].attributes.user.name} ${scores[1].attributes.value}`
-    third.innerText = `3rd ${scores[2].attributes.user.name} ${scores[2].attributes.value}`
-}
 
 const hideRules = () => {
     const rulesText = document.getElementById("rules-text")
@@ -137,7 +160,7 @@ const createUserObject = (json) => {
 const startGame = () => {
     if (currentUser != undefined) {
         snake = {tail:[]}
-        score = 0
+        currentUser.score = 0
         direction = "right"
 
         const head = document.createElement("div")
@@ -163,7 +186,7 @@ const startGame = () => {
             currentScore.style.textAlign = "center"
             document.getElementById("title-holder").appendChild(currentScore)
         }
-        document.getElementById("current-score").textContent = `Score: ${score}`
+        document.getElementById("current-score").textContent = `Score: ${currentUser.score}`
 
 
         active = setInterval(moveSnake, 100)
@@ -205,16 +228,16 @@ const moveSnake = () => {
 
 const changeDirection = (e) => {
     switch (e.key) {
-        case "ArrowUp":
+        case "ArrowUp": case "w":
             direction = "up"
             break;
-        case "ArrowLeft":
+        case "ArrowLeft": case "a":
             direction = "left"
             break;
-        case "ArrowDown":
+        case "ArrowDown": case "s":
             direction = "down"
             break;
-        case "ArrowRight":
+        case "ArrowRight": case "d":
             direction = "right"
             break;
         default:
@@ -232,9 +255,9 @@ const newBlock = () => {
 }
 
 const incrementScore = () =>{
-    score = ++score
+    currentUser.score = ++currentUser.score
     const scoreElement = document.getElementById("current-score")
-    scoreElement.textContent = `Score: ${score}`
+    scoreElement.textContent = `Score: ${currentUser.score}`
 }
 
 const eatBlock = () => {
@@ -277,7 +300,7 @@ const hitTail = ()  => {
 const addLength = () => {
     const newTail = document.createElement("div")
     newTail.setAttribute("class", "tail")
-    snake.tail[`${score}`] = newTail
+    snake.tail[`${currentUser.score}`] = newTail
     // no need to appendChild here, next slither() will take care of it
 }
 
@@ -299,7 +322,7 @@ const endGame = () => {
             "Content-Type": "application/json",
             "Accept": "application/json"
         },
-        body: JSON.stringify({score: score, user_id: currentUser.id})
+        body: JSON.stringify({score: currentUser.score, user_id: currentUser.id})
     }
     fetch(`${BASE_URL}/scores`, configObj)
     // .then(resp => resp.json())
@@ -307,7 +330,7 @@ const endGame = () => {
     // .then(loadHighScores())
     setTimeout(loadHighScores, 1000)
     // reload high scores^^
-
+    document.querySelector("table.high-scores").innerHTML = ""
     const board = document.querySelector("div.game-container")
     // clear div.game-container
     board.innerHTML = ""
